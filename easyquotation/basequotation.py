@@ -14,11 +14,12 @@ class BaseQuotation:
     def __init__(self):
         stock_codes = self.load_stock_codes()
         self.stock_list = self.gen_stock_list(stock_codes)
+        self.session = aiohttp.ClientSession()
 
     def gen_stock_list(self, stock_codes):
         stock_with_exchange_list = list(
-                map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
-                    stock_codes))
+            map(lambda stock_code: ('sh%s' if stock_code.startswith(('5', '6', '9')) else 'sz%s') % stock_code,
+                stock_codes))
 
         stock_list = []
         request_num = len(stock_codes) // self.max_num + 1
@@ -45,7 +46,7 @@ class BaseQuotation:
         return self.get_stock_data(stock_list)
 
     async def get_stocks_by_range(self, params):
-        async with aiohttp.get(self.stock_api + params) as r:
+        async with self.session.get(self.stock_api + params) as r:
             response_text = await r.text()
             return response_text
 
