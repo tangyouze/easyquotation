@@ -2,6 +2,7 @@ import asyncio
 import json
 
 import aiohttp
+import yarl
 
 from . import helpers
 
@@ -46,7 +47,8 @@ class BaseQuotation:
         return self.get_stock_data(stock_list)
 
     async def get_stocks_by_range(self, params):
-        async with self.session.get(self.stock_api + params) as r:
+        url = yarl.URL(self.stock_api + params, encoded=True)
+        async with self.session.get(url) as r:
             response_text = await r.text()
             return response_text
 
